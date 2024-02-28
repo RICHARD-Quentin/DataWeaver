@@ -91,7 +91,7 @@ async def process_entries(entries):
     final_list = await asyncio.gather(*tasks)
     return final_list
 
-async def load_config(config=config):
+async def load_config(config=None):
     """
     Loads the configuration from a JSON file.
 
@@ -100,9 +100,11 @@ async def load_config(config=config):
 
     """
     print('Loading config...')
-
-    async with aiofiles.open('./config/config.yml', 'r', encoding='utf8') as file:
-        content = await file.read()
+    if config is None:
+        async with aiofiles.open('./config/config.yml', 'r', encoding='utf8') as file:
+            content = await file.read()
+    else:
+        content = config
 
     config.update(load(content, Loader=Loader))
     
