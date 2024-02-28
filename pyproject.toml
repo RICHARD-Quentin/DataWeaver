@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "DataWeaver"
 version = "0.1.0"
 authors = [{name = "RICHARD Quentin", email = "richard.quentin88@gmail.com"}]
-description = "DataWeaver is a Python library for extracting and mapping data across various sources like APIs, JSON, and CSV. It offers flexible field mapping through a simple configuration file, enabling easy data integration and transformation for analysis and processing."
+description = "DataWeaver is a Python library for mapping data and transform object to an other. It offers flexible field mapping through a simple configuration object, enabling easy data integration and transformation for analysis and processing."
 readme = "README.md"
 license = {text = "MIT License"}  # Update the license as appropriate
 classifiers = [
