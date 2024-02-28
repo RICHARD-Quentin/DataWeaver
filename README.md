@@ -20,11 +20,14 @@ One of the standout features of this library is its ability to handle complex ke
 
 ## Installation
 
-TODO
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install data-weaver.
+
+```bash
+pip install DataWeaver
+```
 
 ## Usage
 
-There is two function that you can use to process your data:
 This document provides detailed documentation for two asynchronous functions used for processing data entries based on a given configuration.
 
 ## `weave_entry` Function
@@ -38,7 +41,7 @@ The `weave_entry` function asynchronously processes a single entry of data based
 - `*args`: Variable length argument list. Allows for additional arguments to be passed, which might be required by future extensions or modifications without changing the function signature.
 - `**kwargs`: Arbitrary keyword arguments. This function looks for a specific keyword argument:
   - `file_path` (str, optional): If provided and is a string, the function will save the processed data to the specified file path using `save_result_to_file`.
-  If you don"t provide an extention to the file, by default it will register as json, supported extantion are json, csv, yml and yaml
+  If you don"t provide an extention to the file, by default it will register as json, supported extentions are json, csv, yml and yaml
 
 ### Returns
 
@@ -47,6 +50,7 @@ The `weave_entry` function asynchronously processes a single entry of data based
 ### Example Usage
 
 ```python
+from data_weaver import weave_entry
 result = await weave_entry(data, config, file_path="path/to/save/result.json")
 ```
 
@@ -72,6 +76,7 @@ The `weave_entries` function asynchronously processes a list of data entries bas
 ### Example Usage
 
 ```python
+from data_weaver import weave_entries
 results = await weave_entries(data_list, config, file_path="path/to/save/results.json")
 ```
 
@@ -94,6 +99,8 @@ The `crush` function flattens a nested dictionary or list into a flat dictionary
 ### Example Usage
 
 ```python
+from data_weaver import crush
+
 nested = {'a': {'b': {'c': 1, 'd': 2}}, 'e': [3, 4, {'f': 5}]}
 flat = crush(nested)
 print(flat)
@@ -117,6 +124,7 @@ The `construct` function reconstructs a nested dictionary or list from a flat di
 ### Example Usage
 
 ```python
+from data_weaver import construct
 flat = {'a.b.c': 1, 'a.b.d': 2, 'e.0': 3, 'e.1': 4, 'e.2.f': 5}
 nested = construct(flat)
 print(nested)
@@ -125,15 +133,19 @@ print(nested)
 
 ## Configuration
 
-Define mappings and additional fields required for processing your data in the YAML configuration file. Here's an example that demonstrates handling complex keys:
+Define mappings and additional fields required for processing your data in a Dict. Here's an example that demonstrates handling complex keys:
 
-```yaml
-mapping:
-  'person.name': 'fullName'
-  'person.details.age': 'age'
-  'person.children.0.name': 'firstChildName'
-additionalFields:
-  'newField': 'newValue'
+```python
+    config = {
+        'mapping': {
+            'person.name': 'fullName',
+            'person.details.age': 'age',
+            'person.children.0.name': 'firstChildName'
+        },
+        'additionalFields': {
+            'person.details.age': 'yearsOld'
+        }
+    }
 ```
 
 ### Exemple
@@ -172,13 +184,17 @@ Will be transformed to:
 
 ### Other example
   
-  ```yaml
-mapping:
-  'fullName': 'person.name'
-  'age': 'person.details.age'
-  'firstChildName': 'person.children.0.name'
-additionalFields:
-  'newField': 'newValue'
+```python
+    config = {
+        'mapping': {
+            'fullName': 'person.name',
+            'age': 'person.details.age',
+            'firstChildName': 'person.children.0.name'
+        },
+        'additionalFields': {
+            'newField': 'newValue'
+        }
+    }
 ```
 
 The object below:
@@ -212,10 +228,12 @@ Will be transformed to:
 
 You can also map the same field to multiple keys:
 
-```yaml
-mapping:
-  'fullName': 'person.name'
-  'fullName': 'person.details.fullName'
+```python
+config = {
+  'mapping': {
+    'fullName': ['person.name', 'person.details.fullName']
+  }
+}
 ```
 
 This object

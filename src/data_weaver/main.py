@@ -1,7 +1,7 @@
 import json
 import asyncio
 import aiofiles
-from yaml import CLoader as Loader, load
+from yaml import CLoader as Loader
 from data_weaver.utils import crush, construct
 import csv
 import yaml
@@ -115,15 +115,20 @@ async def save_result_to_file(result, file_path):
     _, ext = os.path.splitext(file_path)
     ext = ext.lower()
 
+    if ext not in ['.csv', '.json', '.yml', '.yaml']:
+        print('Invalid file extension. Defaulting to JSON.')
+        ext = '.json'
+
     # Asynchronously write the result to the file based on the extension
     async with aiofiles.open(file_path, 'w', encoding='utf-8') as file:
         if ext == '.csv':
             # Convert the result dict to CSV format
             # Assuming result is a list of dictionaries
-            writer = csv.DictWriter(file, fieldnames=result[0].keys())
-            await file.write(writer.writeheader())
+            writer = csv.DictWriter(file, fieldnames=crush(result[0]).keys())
+            await writer.writeheader()
             for row in result:
-                await file.write(writer.writerow(row))
+                flat_row = crush(row)
+                await writer.writerow(flat_row)
         elif ext == '.yml' or ext == '.yaml':
             # Convert the result dict to YAML format
             yaml_data = yaml.dump(result, allow_unicode=True)
