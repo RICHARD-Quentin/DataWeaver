@@ -1,3 +1,4 @@
+
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
@@ -22,3 +23,6 @@ dependencies = [
 
 [project.urls]
 homepage = "https://github.com/RICHARD-Quentin/DataWeaver"
+
+[tool.mypy]
+mypy_path = ["src"]
