@@ -97,6 +97,7 @@ The `crush` function flattens a nested dictionary or list into a flat dictionary
 nested = {'a': {'b': {'c': 1, 'd': 2}}, 'e': [3, 4, {'f': 5}]}
 flat = crush(nested)
 print(flat)
+// {'a.b.c': 1, 'a.b.d': 2, 'e.0': 3, 'e.1': 4, 'e.2.f': 5}
 ```
 
 ---
@@ -119,6 +120,7 @@ The `construct` function reconstructs a nested dictionary or list from a flat di
 flat = {'a.b.c': 1, 'a.b.d': 2, 'e.0': 3, 'e.1': 4, 'e.2.f': 5}
 nested = construct(flat)
 print(nested)
+// {'a': {'b': {'c': 1, 'd': 2}}, 'e': [3, 4, {'f': 5}]}
 ```
 
 ## Configuration
