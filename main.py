@@ -14,7 +14,7 @@ async def main():
     and writes the final list to another JSON file.
     """
     print('Starting...')
-    start = time.time()
+    # start = time.time()
     await load_config()
 
     async with aiofiles.open('./data/test.json', 'r', encoding='utf8') as file:
@@ -24,9 +24,8 @@ async def main():
     final_list = await process_entries(json_entries.get('data'))
 
     await save_result_to_file(final_list, './data/result.json')
-
     print('Done!')
-    print(f'Time: {time.time() - start}')
+    # print(f'Time: {time.time() - start}')
 
 if __name__ == "__main__":
     asyncio.run(main())
