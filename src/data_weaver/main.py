@@ -40,17 +40,12 @@ async def map_fields(data: dict, final_result):
     """
     for key, source_key in config.get('mapping').items():
         if isinstance(source_key, list):
-            value = {}
-            for key_value in source_key:
-                value[key_value] = data[key_value]
+            value = { key: data[key] for key in source_key}
         elif isinstance(source_key, dict):
-            value = []
-            for key_value in source_key:
-                value.append(data[source_key[key_value]])
+            value = [ data[key] for key in source_key]
         else : 
-            value = data[source_key]
+            value = data.get(source_key)
         final_result[key] = value
-
 
     # for full_key, value in data.items():
     #     new_key = await get_new_key(full_key)
