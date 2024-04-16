@@ -38,14 +38,28 @@ async def map_fields(data: dict, final_result):
     Returns:
         None
     """
-    for full_key, value in data.items():
-        new_key = await get_new_key(full_key)
-        if isinstance(new_key, list):
-            for key in new_key:
-                final_result[key] = value
+    for key, source_key in config.get('mapping').items():
+        if isinstance(source_key, list):
+            value = {}
+            for key_value in source_key:
+                value[key_value] = data[key_value]
+        elif isinstance(source_key, dict):
+            value = []
+            for key_value in source_key:
+                value.append(data[source_key[key_value]])
+        else : 
+            value = data[source_key]
+        final_result[key] = value
 
-        if isinstance(new_key, str):
-            final_result[new_key] = value
+
+    # for full_key, value in data.items():
+    #     new_key = await get_new_key(full_key)
+    #     if isinstance(new_key, list):
+    #         for key in new_key:
+    #             final_result[key] = value
+
+    #     if isinstance(new_key, str):
+    #         final_result[new_key] = value
 
 async def parse_entry(object: dict, final_result, prefix: str = ''):
     """
