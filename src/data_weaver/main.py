@@ -13,7 +13,6 @@ config = {}
 async def transform_value(value, field):
     transform = config.get('transforms', {}).get(field)
     if transform and value is not None:
-        print("Transforming value for field:", field, "with value:", value, "and transform:", transform)
         return await parse_transform(transform, value)
     return value
 
@@ -43,9 +42,7 @@ async def map_fields(data: dict, final_result):
     Returns:
         None
     """
-    print("Mapping fields for data:", data)
     for key, source_key in config.get('mapping').items():
-        print("Mapping key:", key, "with source key:", source_key)
         if isinstance(source_key, dict):
             value = { key: data.get(key) for key in source_key}
         elif isinstance(source_key, list):

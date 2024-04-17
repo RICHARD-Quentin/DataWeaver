@@ -102,9 +102,7 @@ def parse_args(args: str) -> list:
     return kwargs
 
 async def parse_transform(transform: str, value: Any) -> Any:
-    print('parseTransform', transform, value)
     func_name, *args = transform.replace(")", "").split("(")
-    print('parseTransform', func_name, args)
     func = TRANSFORMATIONS.get(func_name)
     if not func:
         print(f"Invalid transform function: {func_name} for value: {value}")
