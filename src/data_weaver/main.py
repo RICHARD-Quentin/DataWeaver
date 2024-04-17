@@ -3,6 +3,7 @@ import asyncio
 import aiofiles
 from yaml import CLoader as Loader
 from data_weaver.utils import crush, construct
+from data_weaver.transforms import parse_transform
 import csv
 import yaml
 import os
@@ -38,13 +39,20 @@ async def map_fields(data: dict, final_result):
     Returns:
         None
     """
+    print("Mapping fields for data:", data)
     for key, source_key in config.get('mapping').items():
-        if isinstance(source_key, list):
+        print("Mapping key:", key, "with source key:", source_key)
+        if isinstance(source_key, dict):
             value = { key: data[key] for key in source_key}
-        elif isinstance(source_key, dict):
+        elif isinstance(source_key, list):
             value = [ data[key] for key in source_key]
         else : 
             value = data.get(source_key)
+        
+        transform = config.get('transforms').get(key)
+        if transform and value is not None:
+            print("Transforming value for key:", key, "with value:", value, "and transform:", transform)
+            value = await parse_transform(transform, value)
         final_result[key] = value
 
     # for full_key, value in data.items():
@@ -65,15 +73,15 @@ async def parse_entry(object: dict, final_result, prefix: str = ''):
         final_result (dict): The dictionary to store the extracted fields.
         prefix (str, optional): The prefix to be added to the extracted field names. Defaults to ''.
     """
-    for key, value in object.items():
-        full_key = f'{prefix}.{key}' if prefix else key
-        if isinstance(value, dict):
-            await parse_entry(value, final_result, full_key)
-        elif isinstance(value, list):
-            for i, item in enumerate(value):
-                await parse_entry(item, final_result, full_key)
-        else:
-            await map_fields({full_key: value}, final_result)
+    # for key, value in object.items():
+    #     full_key = f'{prefix}.{key}' if prefix else key
+    #     if isinstance(value, dict):
+    #         await parse_entry(value, final_result, full_key)
+    #     elif isinstance(value, list):
+    #         for i, item in enumerate(value):
+    #             await parse_entry(item, final_result, full_key)
+    #     else:
+    await map_fields(object, final_result)
 
     for key, value in config.get('additionalFields').items():
         final_result[key] = value

@@ -15,9 +15,9 @@ def capitalize(value: str) -> str:
         return val.capitalize()
     return apply_to_value(value, capitalize_val)
     
-def concat(values: list, separator=' ') -> str:
+def concat(values: list, delimiter=' ') -> str:
     if all(isinstance(value, str) for value in values):
-        return separator.join(values)
+        return delimiter.join(values)
     else:
         raise TypeError("All values in concat must be strings")
     
@@ -49,8 +49,8 @@ def suffix(value: str | list | dict, suffix: str) -> str:
 def split(value: str, delimiter: str = ' ') -> list:
     return value.split(delimiter)
 
-def join(values: list, separator: str = ' ') -> str:
-    return separator.join(values)
+def join(values: list, delimiter: str = ' ') -> str:
+    return delimiter.join(values)
 
 def lower(value: str | list | dict) -> str:
     def lower_val(val):
@@ -72,9 +72,9 @@ def replace(value: str | list | dict, old: str, new: str) -> str:
         return val.replace(old, new)
     return apply_to_value(value, replace_val)
 
-def regex(value: str | list | dict, pattern: str, repl: str) -> str:
+def regex(value: str | list | dict, pattern: str, replace: str) -> str:
     def regex_replace(val):
-        return re.sub(pattern, repl, val)
+        return re.sub(pattern, replace, val)
     return apply_to_value(value, regex_replace)
 
 TRANSFORMATIONS: Dict[str, Callable[..., Any]] = {
@@ -82,20 +82,37 @@ TRANSFORMATIONS: Dict[str, Callable[..., Any]] = {
     "lower": lower,
     "title": title,
     "upper": upper,
-    "concat": lambda args: concat(args[0], args[1]) if len(args) > 1 else concat(args[0]),
-    "parseType": lambda args: parseType(args[0], args[1]),
-    "prefix": lambda args: prefix(args[0], args[1]),
-    "suffix": lambda args: suffix(args[0], args[1]),
-    "split": lambda args: split(args[0], args[1]) if len(args) > 1 else split(args[0]),
-    "join": lambda args: join(args[0], args[1]) if len(args) > 1 else join(args[0]),
-    "replace": lambda args: replace(args[0], args[1], args[2]),
-    "regex": lambda args: regex(args[0], args[1], args[2])
+    "concat": lambda value, delimiter='': concat(value, delimiter),
+    "parseType": lambda value, type_str: parseType(value, type_str),
+    "prefix": lambda value, string: prefix(value, string),
+    "suffix": lambda value, string: suffix(value, string),
+    "split": lambda value, delimiter=None: split(value, delimiter),
+    "join": lambda value, delimiter='': join(value, delimiter),
+    "replace": lambda value, old, new: replace(value, old, new),
+    "regex": lambda value, pattern, replace: regex(value, pattern, replace)
 }
 
-def parseTransform(transform: str, value: Any) -> Any:
+def parse_args(args: str) -> list:
+    kwargs = {}
+    for arg in args:
+        key_values = arg.split(", ")
+        for key_value in key_values:
+            key, value = key_value.split('=')
+            kwargs[key.strip()] = eval(value)  # Using eval to convert the string 'X' to X without quotes
+    return kwargs
+
+async def parse_transform(transform: str, value: Any) -> Any:
+    print('parseTransform', transform, value)
     func_name, *args = transform.replace(")", "").split("(")
+    print('parseTransform', func_name, args)
     func = TRANSFORMATIONS.get(func_name)
     if not func:
-        raise ValueError(f"No such transformation {func_name}")
-    args = [arg.strip() for arg in args[0].split(",")] if args else []
-    return func([value] + args)
+        print(f"Invalid transform function: {func_name} for value: {value}")
+        return value
+    try :
+        kwargs = parse_args(args)
+        return func(value, **kwargs)
+    except Exception as e:
+        print(e)
+        print(f"Error in transform function: {func_name} for value: {value} with args: {args}")
+        return value
