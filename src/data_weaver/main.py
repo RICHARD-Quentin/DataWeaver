@@ -11,7 +11,7 @@ import os
 config = {}
 
 async def transform_value(value, field):
-    transform = config.get('transforms').get(field)
+    transform = config.get('transforms', {}).get(field)
     if transform and value is not None:
         print("Transforming value for field:", field, "with value:", value, "and transform:", transform)
         return await parse_transform(transform, value)
@@ -47,9 +47,9 @@ async def map_fields(data: dict, final_result):
     for key, source_key in config.get('mapping').items():
         print("Mapping key:", key, "with source key:", source_key)
         if isinstance(source_key, dict):
-            value = { key: data[key] for key in source_key}
+            value = { key: data.get(key) for key in source_key}
         elif isinstance(source_key, list):
-            value = [ data[key] for key in source_key]
+            value = [ data.get(key) for key in source_key]
         else : 
             value = data.get(source_key)
         
@@ -83,8 +83,8 @@ async def parse_entry(object: dict, final_result, prefix: str = ''):
     #             await parse_entry(item, final_result, full_key)
     #     else:
     await map_fields(object, final_result)
-
-    for key, value in config.get('additionalFields').items():
+    
+    for key, value in config.get('additionalFields', {}).items():
         final_value = await transform_value(value, key)
         final_result[key] = final_value
 
