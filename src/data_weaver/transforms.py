@@ -21,7 +21,7 @@ def concat(values: list, delimiter=' ') -> str:
     else:
         raise TypeError("All values in concat must be strings")
     
-def parseType(value, typename: str) -> type:
+def parse_type(value, typename: str) -> type:
     try:
         # Mapping string to actual type
         type_map = {
@@ -83,7 +83,7 @@ TRANSFORMATIONS: Dict[str, Callable[..., Any]] = {
     "title": title,
     "upper": upper,
     "concat": lambda value, delimiter='': concat(value, delimiter),
-    "parseType": lambda value, type_str: parseType(value, type_str),
+    "parse_type": lambda value, typename: parse_type(value, typename),
     "prefix": lambda value, string: prefix(value, string),
     "suffix": lambda value, string: suffix(value, string),
     "split": lambda value, delimiter=None: split(value, delimiter),
