@@ -294,6 +294,21 @@ Will be transformed to:
 
 This section of the configuration file specifies how different fields in the data are transformed using various functions. Each key represents a field or type of fields, and the associated value describes the transformation to be applied to that field. These transformations can include formatting, concatenation, type conversion, and more.
 
+| Function Name | Description |
+| --- | --- |
+| `capitalize` | Converts the first character of the string to uppercase and the rest to lowercase. |
+| `lower` | Converts all characters in the string to lowercase. |
+| `upper` | Converts all characters in the string to uppercase. |
+| `title` | Converts the first character of each word to uppercase and the remaining characters of each word to lowercase. |
+| `concat(delimiter=' ')` | Concatenates list elements into a single string with elements separated by the specified delimiter. Default is a space. |
+| `prefix(string='prefix-')` | Prepends the specified string to the beginning of the target string. Default prefix is "prefix-". |
+| `suffix(string='-suffix')` | Appends the specified string to the end of the target string. Default suffix is "-suffix". |
+| `split(delimiter=' ')` | Splits the string into a list of substrings around the specified delimiter. Default is a space. |
+| `join(delimiter=' ')` | Joins elements of a list into a single string with elements separated by the specified delimiter. Default is a space. |
+| `replace(old, new)` | Replaces occurrences of a substring (old) within the string with another substring (new). Options must specify old and new. |
+| `regex(pattern, replace)` | Applies a regular expression pattern to the string and replaces matches with the specified replacement string. Options must specify both pattern and replace. |
+| `parse_type(typename)` | Converts the string to the specified type (typename). Valid types include str, bool, int, and float. |
+
 ## Function Descriptions
 
 ### 1. Text Case Functions:
@@ -642,6 +657,40 @@ PS : bool type is case insensitive, so you can pass :
 
 - "true", "True", "TRUE", "yes",  "Yes", "YES", "y", "Y" it will be converted to True
 - "no", "No", "NO", "n", "N", "false", "False", "FALSE"  it will be converted to False
+
+### Chaining Transformations
+
+You can chain multiple transformations together by describe them in a list. This allows you to apply multiple transformations to a single field in a specific order.
+
+```json
+{
+  "mapping": {
+    "person.cn": ["firstName", "lastName"],
+  },
+  "transforms": {
+    "person.name": ["lower", "concat(delimiter='.')"],
+  }
+}
+```
+
+The object below:
+
+```json
+{
+  "firstName": "John",
+  "lastName": "Doe",
+}
+```
+
+Will be transformed to:
+
+```json
+{
+  "person": {
+    "name": "john.doe",
+  }
+}
+```
 
 ## License
 
