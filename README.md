@@ -140,10 +140,17 @@ There are three main sections in the configuration file:
 - `mapping`: Specifies how keys in the input data should be mapped to keys in the output data. The logical here is the following: `target_key: source_key`.
 - `additionalFields`: Specifies additional fields that should be added to the output data. The logical here is the following: `target_key: value`.
 - `transforms`: Specifies how different fields in the data are transformed using various functions. Each key represents a field or type of fields, and the associated value describes the transformation to be applied to that field.
+- `default`: Specifies default values for fields that may not exist in the input data. This is useful for ensuring that the output data contains all expected fields, even if they are not present in the input data.
+
+In the `default` section there is some sub sections.
+
+- `static`: Specifies default values that are static and do not depend on the input data.
+- `dynamic`: Specifies default values that are dynamic and depend on the input data.
+- `transforms`: Specifies transformations that should be applied to default values.
 
  Here's an example that demonstrates handling complex keys:
 
- ### Configuration File: Mapping
+### Configuration File: Mapping
 
 This section of the configuration file specifies how keys in the input data should be mapped to keys in the output data. Each key represents a target key in the output data, and the associated value represents the source key in the input data.
 
@@ -311,10 +318,11 @@ This section of the configuration file specifies how different fields in the dat
 
 ## Function Descriptions
 
-### 1. Text Case Functions:
+### 1. Text Case Functions
 
 - `capitalize`: Converts the first character of the string to uppercase and the rest to lowercase.
   Example:
+
   ```json
   {
     "mapping": {
@@ -344,6 +352,7 @@ This section of the configuration file specifies how different fields in the dat
 
 - `lower`: Converts all characters in the string to lowercase.
   Example:
+
   ```json
   {
     "mapping": {
@@ -354,20 +363,26 @@ This section of the configuration file specifies how different fields in the dat
     }
   }
   ```
+
   The object below:
+
   ```json
   {
     "fullName": "JOHN DOE",
   }
   ```
+
   Will be transformed to:
+
   ```json
   {
     "fullName": "john doe",
   }
   ```
+
 - `upper`: Converts all characters in the string to uppercase.
   Example:
+
   ```json
   {
     "mapping": {
@@ -378,20 +393,26 @@ This section of the configuration file specifies how different fields in the dat
     }
   }
   ```
+
   The object below:
+
   ```json
   {
     "fullName": "john doe",
   }
   ```
+
   Will be transformed to:
+
   ```json
   {
     "fullName": "JOHN DOE",
   }
   ```
+
 - `title`: Converts the first character of each word to uppercase and the remaining characters of each word to lowercase.
   Example:
+
   ```json
   {
     "mapping": {
@@ -402,22 +423,27 @@ This section of the configuration file specifies how different fields in the dat
     }
   }
   ```
+
   The object below:
+
   ```json
   {
     "fullName": "john doe",
   }
   ```
+
   Will be transformed to:
+
   ```json
   {
     "fullName": "John Doe",
   }
   ```
 
-### 2. String Manipulation Functions:
+### 2. String Manipulation Functions
 
 - `concat(delimiter=' ')`: Concatenates list elements into a single string with elements separated by the specified delimiter. Default is a space.
+
     ```json
   {
     "mapping": {
@@ -428,14 +454,18 @@ This section of the configuration file specifies how different fields in the dat
     }
   }
   ```
+
   The object below:
+
   ```json
   {
     "firstName": "John",
     "lastName": "Doe",
   }
   ```
+
   Will be transformed to:
+
   ```json
   {
     "person": {
@@ -443,8 +473,10 @@ This section of the configuration file specifies how different fields in the dat
     }
   }
   ```
+
 - `prefix(string='prefix-')`: Prepends the specified string to the beginning of the target string. Default prefix is "prefix-".
   Example:
+
   ```json
   {
     "mapping": {
@@ -455,7 +487,9 @@ This section of the configuration file specifies how different fields in the dat
     }
   }
   ```
+
   The object below:
+
   ```json
   {
     "fullName": "world",
@@ -463,6 +497,7 @@ This section of the configuration file specifies how different fields in the dat
   ```
 
   Will be transformed to:
+
   ```json
   {
     "person": {
@@ -473,6 +508,7 @@ This section of the configuration file specifies how different fields in the dat
 
 - `suffix(string='-suffix')`: Appends the specified string to the end of the target string. Default suffix is "-suffix".
   Example:
+
   ```json
   {
     "mapping": {
@@ -483,13 +519,17 @@ This section of the configuration file specifies how different fields in the dat
     }
   }
   ```
+
   The object below:
+
   ```json
   {
     "fullName": "hello",
   }
   ```
+
   Will be transformed to:
+
   ```json
   {
     "person": {
@@ -500,6 +540,7 @@ This section of the configuration file specifies how different fields in the dat
 
 - `split(delimiter=' ')`: Splits the string into a list of substrings around the specified delimiter. Default is a space.
   Example:
+
   ```json
   {
     "mapping": {
@@ -510,13 +551,17 @@ This section of the configuration file specifies how different fields in the dat
     }
   }
   ```
+
   The object below:
+
   ```json
   {
     "fullName": "John Doe",
   }
   ```
+
   Will be transformed to:
+
   ```json
   {
     "person": {
@@ -525,8 +570,8 @@ This section of the configuration file specifies how different fields in the dat
   }
   ```
 
-
 - `join(delimiter=' ')`: Joins elements of a list into a single string with elements separated by the specified delimiter. Default is a space.
+
     ```json
   {
     "mapping": {
@@ -537,14 +582,18 @@ This section of the configuration file specifies how different fields in the dat
     }
   }
   ```
+
   The object below:
+
   ```json
   {
     "firstName": "John",
     "lastName": "Doe",
   }
   ```
+
   Will be transformed to:
+
   ```json
   {
     "person": {
@@ -553,11 +602,12 @@ This section of the configuration file specifies how different fields in the dat
   }
   ```
 
-### 3. Replacement and Pattern Matching Functions:
+### 3. Replacement and Pattern Matching Functions
 
 - `replace(old, new)`: Replaces occurrences of a substring (old) within the string with another substring (new). Options must specify old and new.
   Example:
-  ```json 
+
+  ```json
   {
     "mapping": {
       "person.name": "fullName",
@@ -569,6 +619,7 @@ This section of the configuration file specifies how different fields in the dat
   ```
 
   The object below:
+
   ```json
   {
     "fullName": "world",
@@ -576,6 +627,7 @@ This section of the configuration file specifies how different fields in the dat
   ```
 
   Will be transformed to:
+
   ```json
   {
     "person": {
@@ -583,8 +635,10 @@ This section of the configuration file specifies how different fields in the dat
     }
   }
   ```
+
 - `regex(pattern, replace)`: Applies a regular expression pattern to the string and replaces matches with the specified replacement string. Options must specify both pattern and replace.
   Example:
+
   ```json
   {
     "mapping": {
@@ -595,13 +649,17 @@ This section of the configuration file specifies how different fields in the dat
     }
   }
   ```
+
   The object below:
+
   ```json
   {
     "fullName": "world",
   }
   ```
+
   Will be transformed to:
+
   ```json
   {
     "person": {
@@ -610,10 +668,11 @@ This section of the configuration file specifies how different fields in the dat
   }
   ```
 
-### 4. Type Parsing Functions:
+### 4. Type Parsing Functions
 
 - `parse_type(typename)`: Converts the string to the specified type (typename). Valid types include str, bool, int, and float.
   Example:
+
   ```json
   {
     "mapping": {
@@ -632,7 +691,9 @@ This section of the configuration file specifies how different fields in the dat
     }
   }
   ```
+
   The object below:
+
   ```json
   {
     "age": "30",
@@ -642,7 +703,9 @@ This section of the configuration file specifies how different fields in the dat
     "student_id": 12345,
   }
   ```
+
   Will be transformed to:
+
   ```json
   {
     "age_mapped": 30,
@@ -877,7 +940,6 @@ Will be transformed to:
     "fullname": "John Doe"
 }
 ```
-
 
 ## License
 
