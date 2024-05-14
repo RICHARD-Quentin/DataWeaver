@@ -692,6 +692,193 @@ Will be transformed to:
 }
 ```
 
+### Default Values
+
+You can also specify default values for fields that may not exist in the input data. This is useful for ensuring that the output data contains all expected fields, even if they are not present in the input data.
+
+```json
+{
+  "mapping": {
+    "person.name": "fullName",
+    "person.age": "age",
+  },
+  "default": {
+    "static": {
+      "person.age": 0,
+    },
+    "dynamic": {
+      "person.name": ["firstName", "lastName"],
+    }
+  }
+}
+
+```
+
+The object below:
+
+```json
+{
+  "fullName": "John Doe",
+  "firstName": "John",
+  "lastName": "Doe",
+  "age": 30,
+}
+
+```
+
+Will be transformed to:
+
+```json
+{
+  "person": {
+    "name": "John Doe",
+    "age": 30,
+  }
+}
+
+```
+
+But if there is no age in the input data, and no fullname the output will be:
+
+```json
+{
+  "person": {
+    "name": ["John", "Doe"],
+    "age": 0,
+  }
+}
+
+```
+
+You can also add transformations to default values:
+
+```json
+{
+  "mapping": {
+    "person.name": "fullName",
+    "person.age": "age",
+  },
+  "default": {
+    "static": {
+      "person.age": 0,
+    },
+    "dynamic": {
+      "person.name": ["firstName", "lastName"],
+    },
+    "transforms": {
+      "person.name": ["lower", "concat(delimiter='.')"],
+    }
+  }
+}
+
+```
+
+The object below:
+
+```json
+{
+  "fullName": "John Doe",
+  "firstName": "John",
+  "lastName": "Doe",
+}
+
+```
+
+Will be transformed to:
+
+```json
+{
+  "person": {
+    "name": "john.doe",
+    "age": 0,
+  }
+}
+
+```
+
+### Advanced Configuration
+
+Here's an example of a more complex configuration file that demonstrates the use of multiple mapping, additional fields, and transformation functions:
+
+```json
+config = {
+  "mapping": {
+    "uid": "login",
+    "uid2": "login2",
+    "fullname": ["nom", "prenom"],
+  },
+  "transforms": {
+    "fullname": ["join(delimiter=' ')"],
+    "uid": ["replace(old='.', new='')"],
+  },
+  "default": {
+    "dynamic": {
+      "uid": ["nom", "prenom"]
+    },
+    "static": {
+      "uid2": "test"
+    },
+    "transforms": {
+      "uid": ["join(delimiter='.')","lower", "regex(pattern='(?<=\\b\\w)\\w+(?=\\.)', replace='')"],
+    },
+  }
+}
+```
+
+This configuration file specifies the following:
+
+- The `uid` field in the output data should be mapped to the `login` field in the input data.
+- The `uid2` field in the output data should be mapped to the `login2` field in the input data.
+- The `fullname` field in the output data should be mapped to the `nom` and `prenom` fields in the input data. The transformations applied to this field are:
+  - Convert the field to lowercase.
+  - Join the elements of the list with a period (`.`) delimiter.
+  - Apply a regular expression to remove all characters after the first period (`.`) in the string.
+- The `uid` field should be created by joining the `nom` and `prenom` fields in the input data, converting the result to lowercase, and removing all characters after the first period (`.`) in the string.
+- The `uid2` field should have a default value of `test`.
+- The `uid` field should have a default value of `nom` and `prenom` in the input data, converted to lowercase, and with all characters after the first period (`.`) removed.
+
+The following input data:
+
+```json
+{
+  "login": "John.Doe",
+  "login2": "Jane.Doe",
+  "nom": "John",
+  "prenom": "Doe"
+}
+```
+
+Will be transformed to:
+
+```json
+{
+    "uid": "JohnDoe",
+    "uid2": "Jane.Doe",
+    "fullname": "John Doe"
+}
+```
+
+And this one :
+
+```json
+{
+  "login2": "Jane.Doe",
+  "nom": "John",
+  "prenom": "Doe"
+}
+```
+
+Will be transformed to:
+
+```json
+{
+    "uid": "j.doe",
+    "uid2": "Jane.Doe",
+    "fullname": "John Doe"
+}
+```
+
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
