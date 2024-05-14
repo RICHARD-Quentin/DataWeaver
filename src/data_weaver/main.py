@@ -12,7 +12,13 @@ config = {}
 
 async def transform_value(value, field):
     transform = config.get('transforms', {}).get(field)
-    if transform and value is not None:
+    if transform and value is None:
+        return value
+    if isinstance(transform, list):
+        for t in transform:
+            value = await parse_transform(t, value)
+        return value
+    if transform:
         return await parse_transform(transform, value)
     return value
 
