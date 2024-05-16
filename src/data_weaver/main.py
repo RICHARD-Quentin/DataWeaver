@@ -155,6 +155,9 @@ async def map_fields(data: dict, final_result):
         value = handle_value(data, source_key, key)
         final_result[key] = value
 
+    for key, value in config.get('additionalFields').items():
+        final_result[key] = value
+
 async def process_entry(entry):
     final_result = {}
     flat_object = crush(entry)
