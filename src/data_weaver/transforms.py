@@ -50,7 +50,7 @@ def split(value: str, delimiter: str = ' ') -> list:
     return value.split(delimiter)
 
 def join(values: list, delimiter: str = ' ') -> str:
-    return delimiter.join(values)
+    return delimiter.join(map(str, values))
 
 def lower(value: str | list | dict) -> str:
     def lower_val(val):

@@ -307,11 +307,11 @@ This section of the configuration file specifies how different fields in the dat
 | `lower` | Converts all characters in the string to lowercase. |
 | `upper` | Converts all characters in the string to uppercase. |
 | `title` | Converts the first character of each word to uppercase and the remaining characters of each word to lowercase. |
-| `concat(delimiter=' ')` | Concatenates list elements into a single string with elements separated by the specified delimiter. Default is a space. |
+| `concat(delimiter=' ')` | Concatenates list elements into a single string with elements separated by the specified delimiter. Default is a space. /!\ All elements must be strings |
+| `join(delimiter=' ')` | Joins elements of a list into a single string with elements separated by the specified delimiter. Default is a space. |
 | `prefix(string='prefix-')` | Prepends the specified string to the beginning of the target string. Default prefix is "prefix-". |
 | `suffix(string='-suffix')` | Appends the specified string to the end of the target string. Default suffix is "-suffix". |
 | `split(delimiter=' ')` | Splits the string into a list of substrings around the specified delimiter. Default is a space. |
-| `join(delimiter=' ')` | Joins elements of a list into a single string with elements separated by the specified delimiter. Default is a space. |
 | `replace(old, new)` | Replaces occurrences of a substring (old) within the string with another substring (new). Options must specify old and new. |
 | `regex(pattern, replace)` | Applies a regular expression pattern to the string and replaces matches with the specified replacement string. Options must specify both pattern and replace. |
 | `parse_type(typename)` | Converts the string to the specified type (typename). Valid types include str, bool, int, and float. |
