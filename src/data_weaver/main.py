@@ -38,18 +38,48 @@ def handle_value(data, source_key, target_key, default=True):
         return value, False
     
     def handle_dict(source_key: dict):
+        """
+        
+        Handles the dictionary value of the given key in the data dictionary.
+
+        Args:
+            source_key (dict): The key to retrieve the value from.
+
+        Returns:
+            dict: The handled dictionary.
+
+        """
         handled_dict, is_default = {sub_key: get_value_with_default(sub_key)[0] for sub_key in source_key}, any(get_value_with_default(sub_key)[1] for sub_key in source_key)
         if is_default:
             return handled_dict
         return transform_value(handled_dict, target_key)
     
     def handle_list(source_key: list):
+        """
+        Handles the list value of the given key in the data dictionary.
+
+        Args:
+            source_key (list): The key to retrieve the value from.
+
+        Returns:
+            list: The handled list.
+
+        """
         handled_list, is_default = [get_value_with_default(sub_key)[0] for sub_key in source_key], any(get_value_with_default(sub_key)[1] for sub_key in source_key)
         if is_default:
             return handled_list
         return transform_value(handled_list, target_key)
 
     def handle_default(source_key):
+        """
+        Handles the default value for the given key.
+
+        Args:
+            source_key (str): The key to retrieve the value from.
+
+        Returns:
+            Any: The handled value.
+        """
         handled_value, is_default = get_value_with_default(source_key)
         if is_default:
             return handled_value
@@ -73,13 +103,11 @@ def handle_default_value(data, target_key):
         key (str): The key to retrieve the default value for.
     """
     default_source_key = config.get('default', {}).get('dynamic', {}).get(target_key)
-    print("default_source_key", default_source_key)
     if default_source_key is not None:
         value = handle_value(data, default_source_key, target_key, False)
         return transform_value(value, target_key, True)
     
     default_source_value = config.get('default', {}).get('static', {}).get(target_key)
-    print("default_source_value", default_source_value)
     if default_source_value is not None:
         return default_source_value
     
@@ -87,6 +115,17 @@ def handle_default_value(data, target_key):
     
 
 def transform_value(value, field, default=False):
+    """
+    Transforms the given value based on the configuration.
+
+    Args:
+        value (Any): The value to transform.
+        field (str): The field name.
+        default (bool, optional): Whether to use the default configuration. Defaults to False.
+
+    Returns:
+        Any: The transformed value.
+    """
     if default:
         transform = config.get('default', {}).get('transforms', {}).get(field)
     else:
@@ -101,25 +140,9 @@ def transform_value(value, field, default=False):
         return parse_transform(transform, value)
     return value
 
-async def get_new_key(key: str):
-    """
-    Retrieves a new key from the given config based on the given key.
-
-    Args:
-        key (str): The original key.
-
-    Returns:
-        str: The new key.
-
-    """
-    simple_key = key.split('.')[-1]
-    return config.get('mapping').get(key, config.get(simple_key))
-
 async def map_fields(data: dict, final_result):
     """
-    Maps the fields of the given data dictionary to new keys using the get_new_key function,
-    and adds the mapped key-value pairs to the final_result dictionary.
-
+    Maps the fields of the data dictionary to the final_result dictionary based on the configuration.
     Args:
         data (dict): The input data dictionary.
         final_result (dict): The dictionary to store the mapped key-value pairs.
@@ -130,37 +153,12 @@ async def map_fields(data: dict, final_result):
     
     for key, source_key in config.get('mapping').items():
         value = handle_value(data, source_key, key)
-        
-        # final_value = transform_value(value, key)
         final_result[key] = value
-
-async def parse_entry(object: dict, final_result, prefix: str = ''):
-    """
-    Parse the given object recursively and update the final_result dictionary with the extracted fields.
-
-    Parameters:
-        object (dict): The object to be parsed.
-        final_result (dict): The dictionary to store the extracted fields.
-        prefix (str, optional): The prefix to be added to the extracted field names. Defaults to ''.
-    """
-    # for key, value in object.items():
-    #     full_key = f'{prefix}.{key}' if prefix else key
-    #     if isinstance(value, dict):
-    #         await parse_entry(value, final_result, full_key)
-    #     elif isinstance(value, list):
-    #         for i, item in enumerate(value):
-    #             await parse_entry(item, final_result, full_key)
-    #     else:
-    await map_fields(object, final_result)
-    
-    # for key, value in config.get('additionalFields', {}).items():
-    #     final_value = await transform_value(value, key)
-    #     final_result[key] = final_value
 
 async def process_entry(entry):
     final_result = {}
     flat_object = crush(entry)
-    await parse_entry(flat_object, final_result)
+    await map_fields(flat_object, final_result)
     return construct(final_result)
 
 async def process_entries(entries):
