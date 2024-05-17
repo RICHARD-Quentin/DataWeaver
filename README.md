@@ -307,6 +307,7 @@ This section of the configuration file specifies how different fields in the dat
 | `lower` | Converts all characters in the string to lowercase. |
 | `upper` | Converts all characters in the string to uppercase. |
 | `title` | Converts the first character of each word to uppercase and the remaining characters of each word to lowercase. |
+| `remove_accent` | Removes accents from characters in the string. |
 | `concat(delimiter=' ')` | Concatenates list elements into a single string with elements separated by the specified delimiter. Default is a space. /!\ All elements must be strings |
 | `join(delimiter=' ')` | Joins elements of a list into a single string with elements separated by the specified delimiter. Default is a space. |
 | `prefix(string='prefix-')` | Prepends the specified string to the beginning of the target string. Default prefix is "prefix-". |
@@ -437,6 +438,35 @@ This section of the configuration file specifies how different fields in the dat
   ```json
   {
     "fullName": "John Doe",
+  }
+  ```
+
+- `remove_accent`: Removes accents from characters in the string.
+
+  ```json
+  {
+    "mapping": {
+      "person.name": "fullName",
+    },
+    "transforms": {
+      "person.name": "remove_accent",
+    }
+  }
+  ```
+
+  The object below:
+
+  ```json
+  {
+    "fullName": "éàçè",
+  }
+  ```
+
+  Will be transformed to:
+
+  ```json
+  {
+    "fullName": "eace",
   }
   ```
 
