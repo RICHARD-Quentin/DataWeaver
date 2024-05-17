@@ -1,6 +1,7 @@
 
 import re
 from typing import Any, Callable, Dict
+import unicodedata
 
 def apply_to_value(value, func, *args, **kwargs):
     if isinstance(value, dict):
@@ -77,11 +78,17 @@ def regex(value: str | list | dict, pattern: str, replace: str) -> str:
         return re.sub(pattern, replace, val)
     return apply_to_value(value, regex_replace)
 
+def remove_accents(value: str) -> str:
+        def remove_accents_val(val):
+            return ''.join(c for c in unicodedata.normalize('NFD', val) if unicodedata.category(c) != 'Mn')
+        return apply_to_value(value, remove_accents_val)
+
 TRANSFORMATIONS: Dict[str, Callable[..., Any]] = {
     "capitalize": capitalize,
     "lower": lower,
     "title": title,
     "upper": upper,
+    "remove_accents": remove_accents,
     "concat": lambda value, delimiter='': concat(value, delimiter),
     "parse_type": lambda value, typename: parse_type(value, typename),
     "prefix": lambda value, string: prefix(value, string),
@@ -89,7 +96,7 @@ TRANSFORMATIONS: Dict[str, Callable[..., Any]] = {
     "split": lambda value, delimiter=None: split(value, delimiter),
     "join": lambda value, delimiter='': join(value, delimiter),
     "replace": lambda value, old, new: replace(value, old, new),
-    "regex": lambda value, pattern, replace: regex(value, pattern, replace)
+    "regex": lambda value, pattern, replace: regex(value, pattern, replace),
 }
 
 def parse_args(args: str) -> dict:
