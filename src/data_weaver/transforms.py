@@ -51,7 +51,8 @@ def split(value: str, delimiter: str = ' ') -> list:
     return value.split(delimiter)
 
 def join(values: list, delimiter: str = ' ') -> str:
-    return delimiter.join(map(str, values))
+    values = [str(value) if value is not None else '' for value in values]
+    return delimiter.join(values)
 
 def lower(value: str | list | dict) -> str:
     def lower_val(val):
