@@ -65,7 +65,7 @@ def handle_value(data, source_key, target_key, default=True):
             list: The handled list.
 
         """
-        handled_list, is_default = [get_value_with_default(sub_key)[0] for sub_key in source_key], any(get_value_with_default(sub_key)[1] for sub_key in source_key)
+        handled_list, is_default = [get_value_with_default(sub_key)[0] for sub_key in source_key], all(get_value_with_default(sub_key)[1] for sub_key in source_key)
         if is_default:
             return handled_list
         return transform_value(handled_list, target_key)
